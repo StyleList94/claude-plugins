@@ -1,0 +1,10 @@
+{
+  "name": "stylish-git",
+  "description": "Git workflow tools including intelligent commit messages",
+  "version": "1.0.0",
+  "author": {
+    "name": "StyleList94"
+  },
+  "license": "MIT",
+  "keywords": ["git", "commit", "rebase", "branch", "cleanup", "conflict-resolution", "conventional-commits", "automation"]
+}

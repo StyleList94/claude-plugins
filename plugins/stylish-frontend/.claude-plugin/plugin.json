@@ -1,0 +1,10 @@
+{
+  "name": "stylish-frontend",
+  "description": "Frontend component development workflow: Figma to code, testing, and orchestration",
+  "version": "1.0.0",
+  "author": {
+    "name": "StyleList94"
+  },
+  "license": "MIT",
+  "keywords": ["frontend", "react", "figma", "vitest", "testing", "components", "tailwind", "workflow"]
+}
