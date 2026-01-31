@@ -55,10 +55,6 @@ feat: migrate to vanilla-extract
 * chore: update vite plugin
 ```
 
-## Breaking Changes
-
-- Add `!` after type/scope: `feat!: remove deprecated API`
-
 ## Process
 
 1. Run `git diff --staged` to analyze changes

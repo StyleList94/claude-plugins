@@ -1,7 +1,7 @@
 {
   "name": "stylish-git",
   "description": "Git workflow tools including intelligent commit messages",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "StyleList94"
   },
