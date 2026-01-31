@@ -30,9 +30,9 @@ Git 워크플로우 도구 모음.
 
 **스킬:**
 
-- `/stylish-commit` - 지능형 커밋 메시지 생성기
-- `/stylish-rebase` - 대화형 리베이스 도우미
-- `/stylish-cleanup-branch` - 브랜치 정리 및 관리
+- `/stylish-git:commit` - 지능형 커밋 메시지 생성기
+- `/stylish-git:rebase` - 대화형 리베이스 도우미
+- `/stylish-git:cleanup-branch` - 브랜치 정리 및 관리
 
 ---
 
@@ -42,8 +42,8 @@ Git 워크플로우 도구 모음.
 
 **스킬:**
 
-- `/stylish-readme` - README 파일 생성기
-- `/stylish-react-tsdoc` - React 컴포넌트 TSDoc 생성기
+- `/stylish-docs:readme` - README 파일 생성기
+- `/stylish-docs:react-tsdoc` - React 컴포넌트 TSDoc 생성기
 
 ---
 
@@ -53,11 +53,11 @@ Git 워크플로우 도구 모음.
 
 **스킬:**
 
-- `/stylish-figma-to-code` - Figma 디자인을 코드로 변환 (Figma MCP 필요)
-- `/stylish-vitest-browser` - Vitest 브라우저 테스트 작성
-- `/stylish-component-workflow` - 컴포넌트 개발 워크플로우
+- `/stylish-frontend:figma-to-code` - Figma 디자인을 코드로 변환 (Figma MCP 필요)
+- `/stylish-frontend:vitest-browser` - Vitest 브라우저 테스트 작성
+- `/stylish-frontend:component-workflow` - 컴포넌트 개발 워크플로우
 
-> **참고:** `/stylish-figma-to-code`는 [Figma MCP Server](https://github.com/figma/mcp-server-guide) 설정이 필요합니다.
+> **참고:** `/stylish-frontend:figma-to-code`는 [Figma MCP Server](https://github.com/figma/mcp-server-guide) 설정이 필요합니다.
 
 ## 라이선스
 

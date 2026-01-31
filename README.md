@@ -28,9 +28,9 @@ Git workflow tools for streamlined version control operations.
 
 **Skills:**
 
-- `/stylish-commit` - Intelligent commit message generator
-- `/stylish-rebase` - Interactive rebase assistance
-- `/stylish-cleanup-branch` - Branch cleanup and management
+- `/stylish-git:commit` - Intelligent commit message generator
+- `/stylish-git:rebase` - Interactive rebase assistance
+- `/stylish-git:cleanup-branch` - Branch cleanup and management
 
 ---
 
@@ -40,8 +40,8 @@ Documentation generator for README and React TSDoc.
 
 **Skills:**
 
-- `/stylish-readme` - README file generator
-- `/stylish-react-tsdoc` - React component TSDoc generator
+- `/stylish-docs:readme` - README file generator
+- `/stylish-docs:react-tsdoc` - React component TSDoc generator
 
 ---
 
@@ -51,9 +51,9 @@ Frontend component development workflow tools.
 
 **Skills:**
 
-- `/stylish-figma-to-code` - Convert Figma designs to code (requires Figma MCP)
-- `/stylish-vitest-browser` - Vitest browser test generation
-- `/stylish-component-workflow` - Component development workflow
+- `/stylish-frontend:figma-to-code` - Convert Figma designs to code (requires Figma MCP)
+- `/stylish-frontend:vitest-browser` - Vitest browser test generation
+- `/stylish-frontend:component-workflow` - Component development workflow
 
 > **Note:** `/stylish-figma-to-code` requires [Figma MCP Server](https://github.com/figma/mcp-server-guide).
 
