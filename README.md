@@ -29,6 +29,7 @@ Git workflow tools for streamlined version control operations.
 **Skills:**
 
 - `/stylish-git:commit` - Intelligent commit message generator
+- `/stylish-git:squash` - Squash commits like GitHub PR merge
 - `/stylish-git:rebase` - Interactive rebase assistance
 - `/stylish-git:cleanup-branch` - Branch cleanup and management
 

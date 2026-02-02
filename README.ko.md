@@ -31,6 +31,7 @@ Git 워크플로우 도구 모음.
 **스킬:**
 
 - `/stylish-git:commit` - 지능형 커밋 메시지 생성기
+- `/stylish-git:squash` - GitHub PR 스쿼시 머지 스타일로 커밋 합치기
 - `/stylish-git:rebase` - 대화형 리베이스 도우미
 - `/stylish-git:cleanup-branch` - 브랜치 정리 및 관리
 

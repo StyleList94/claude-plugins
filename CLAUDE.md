@@ -62,3 +62,7 @@ Instructions for Claude when this skill is invoked.
 - Plugin names: kebab-case (e.g., `review-plugin`)
 - Skill names: kebab-case, matching the slash command (e.g., `review` for `/review`)
 - Marketplace name: `stylish-code` (users install via `@stylish-code` suffix)
+
+## Documentation
+
+- Update both `README.md` (English) and `README.ko.md` (Korean) when adding/modifying plugins
