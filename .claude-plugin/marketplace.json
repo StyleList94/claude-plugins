@@ -12,9 +12,10 @@
       "name": "stylish-git",
       "source": "./plugins/stylish-git",
       "description": "Git workflow tools including intelligent commit messages",
-      "version": "1.0.1",
+      "version": "1.1.0",
       "category": "git",
-      "tags": ["git", "commit", "conventional-commits"]
+      "tags": ["git", "commit", "rebase", "squash", "conventional-commits"],
+      "strict": false
     },
     {
       "name": "stylish-docs",
@@ -22,7 +23,8 @@
       "description": "Documentation generator for README and React TSDoc",
       "version": "1.0.1",
       "category": "documentation",
-      "tags": ["docs", "documentation", "jsdoc", "readme"]
+      "tags": ["docs", "documentation", "jsdoc", "readme"],
+      "strict": false
     },
     {
       "name": "stylish-frontend",
@@ -30,7 +32,8 @@
       "description": "Frontend component development workflow: Figma to code, testing, and orchestration",
       "version": "1.0.1",
       "category": "frontend",
-      "tags": ["frontend", "react", "figma", "vitest", "testing", "components", "tailwind", "workflow"]
+      "tags": ["frontend", "react", "figma", "vitest", "testing", "components", "tailwind", "workflow"],
+      "strict": false
     }
   ]
 }
