@@ -30,19 +30,27 @@ Git workflow tools for streamlined version control operations.
 
 - `/stylish-git:commit` - Intelligent commit message generator
 - `/stylish-git:squash` - Squash commits like GitHub PR merge
-- `/stylish-git:rebase` - Interactive rebase assistance
+- `/stylish-git:rebase` - Rebase with intelligent conflict resolution
 - `/stylish-git:cleanup-branch` - Branch cleanup and management
 
 ---
 
 ### stylish-docs
 
-Documentation generator for README and React TSDoc.
+Documentation generator and reviewer for README and React TSDoc.
 
 **Skills:**
 
 - `/stylish-docs:readme` - README file generator
 - `/stylish-docs:react-tsdoc` - React component TSDoc generator
+
+**Agents:**
+
+- `doc-reviewer` - Review documentation for quality, completeness, and code-docs consistency
+
+**Output Styles:**
+
+- `doc-review-report` - Structured format for documentation review results
 
 ---
 
@@ -56,7 +64,15 @@ Frontend component development workflow tools.
 - `/stylish-frontend:vitest-browser` - Vitest browser test generation
 - `/stylish-frontend:component-workflow` - Component development workflow
 
-> **Note:** `/stylish-figma-to-code` requires [Figma MCP Server](https://github.com/figma/mcp-server-guide).
+**Agents:**
+
+- `component-reviewer` - Review components for pattern consistency, accessibility, and best practices
+
+**Output Styles:**
+
+- `component-review-report` - Structured format for component review results
+
+> **Note:** `/stylish-frontend:figma-to-code` requires [Figma MCP Server](https://github.com/figma/mcp-server-guide).
 
 ## License
 

@@ -5,34 +5,47 @@
     "email": "me@stylelist94.dev"
   },
   "metadata": {
-    "description": "Stylish productivity plugins for Claude Code"
+    "description": "Stylish productivity plugins for Claude Code",
+    "version": "2.0.0"
   },
   "plugins": [
     {
       "name": "stylish-git",
       "source": "./plugins/stylish-git",
       "description": "Git workflow tools including intelligent commit messages",
-      "version": "1.1.0",
+      "version": "2.0.0",
       "category": "git",
-      "tags": ["git", "commit", "rebase", "squash", "conventional-commits"],
+      "keywords": ["git", "commit", "rebase", "squash", "conventional-commits", "branch-cleanup"],
+      "author": { "name": "StyleList94" },
+      "homepage": "https://github.com/StyleList94/claude-plugins",
+      "repository": "https://github.com/StyleList94/claude-plugins",
+      "license": "MIT",
       "strict": false
     },
     {
       "name": "stylish-docs",
       "source": "./plugins/stylish-docs",
-      "description": "Documentation generator for README and React TSDoc",
-      "version": "1.0.1",
+      "description": "Documentation generator and reviewer for README and React TSDoc",
+      "version": "2.0.0",
       "category": "documentation",
-      "tags": ["docs", "documentation", "jsdoc", "readme"],
+      "keywords": ["docs", "documentation", "tsdoc", "readme", "review"],
+      "author": { "name": "StyleList94" },
+      "homepage": "https://github.com/StyleList94/claude-plugins",
+      "repository": "https://github.com/StyleList94/claude-plugins",
+      "license": "MIT",
       "strict": false
     },
     {
       "name": "stylish-frontend",
       "source": "./plugins/stylish-frontend",
-      "description": "Frontend component development workflow: Figma to code, testing, and orchestration",
-      "version": "1.0.1",
+      "description": "Frontend component development workflow: Figma to code, testing, review, and orchestration",
+      "version": "2.0.0",
       "category": "frontend",
-      "tags": ["frontend", "react", "figma", "vitest", "testing", "components", "tailwind", "workflow"],
+      "keywords": ["frontend", "react", "figma", "vitest", "testing", "components", "tailwind", "workflow", "accessibility"],
+      "author": { "name": "StyleList94" },
+      "homepage": "https://github.com/StyleList94/claude-plugins",
+      "repository": "https://github.com/StyleList94/claude-plugins",
+      "license": "MIT",
       "strict": false
     }
   ]

@@ -1,5 +1,7 @@
 ---
+name: rebase
 description: Rebase branch with intelligent conflict resolution and force push
+tools: Bash, Read, Edit, AskUserQuestion
 ---
 
 Rebase current branch onto base branch with smart conflict resolution.

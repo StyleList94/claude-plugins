@@ -1,5 +1,7 @@
 ---
+name: cleanup-branch
 description: Clean up merged and stale branches from local and remote
+tools: Bash, Read, AskUserQuestion
 ---
 
 Clean up branches that have been merged or are no longer needed.

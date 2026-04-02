@@ -1,5 +1,7 @@
 ---
+name: vitest-browser
 description: Generate Vitest Browser Mode tests with intelligent component classification (Simple/Complex)
+argument-hint: "[file-path] [--simple|--complex]"
 ---
 
 # Vitest Browser Mode Test Generation

@@ -1,5 +1,7 @@
 ---
+name: commit
 description: Generate intelligent commit messages following StyleList94's commit convention
+tools: Bash, Read, Grep
 ---
 
 Analyze staged changes and generate a commit message following the project's commit convention.

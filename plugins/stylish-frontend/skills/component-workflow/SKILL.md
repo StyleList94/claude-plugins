@@ -1,5 +1,7 @@
 ---
+name: component-workflow
 description: Full component development workflow - Figma design to tested React component
+argument-hint: "[figma-url] [--react|--astro]"
 ---
 
 # Component Development Workflow
