@@ -50,7 +50,7 @@ ref handling, controlled/uncontrolled, compound components, props forwarding, AP
 
 ---
 
-### Naming & Type Issues
+### Naming & Types Issues
 
 > **[ComponentName]** `[filepath:line]`
 > 
