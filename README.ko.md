@@ -34,6 +34,7 @@ Git 워크플로우 도구 모음.
 - `/stylish-git:squash` - GitHub PR 스쿼시 머지 스타일로 커밋 합치기
 - `/stylish-git:rebase` - 지능형 충돌 해결 리베이스
 - `/stylish-git:cleanup-branch` - 브랜치 정리 및 관리
+- `/stylish-git:create-worktree` - 격리된 워크트리 생성
 
 ---
 

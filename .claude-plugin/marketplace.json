@@ -15,7 +15,7 @@
       "description": "Git workflow tools including intelligent commit messages",
       "version": "2.0.0",
       "category": "git",
-      "keywords": ["git", "commit", "rebase", "squash", "conventional-commits", "branch-cleanup"],
+      "keywords": ["git", "commit", "rebase", "squash", "conventional-commits", "branch-cleanup", "worktree"],
       "author": { "name": "StyleList94" },
       "homepage": "https://github.com/StyleList94/claude-plugins",
       "repository": "https://github.com/StyleList94/claude-plugins",

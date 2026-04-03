@@ -32,6 +32,7 @@ Git workflow tools for streamlined version control operations.
 - `/stylish-git:squash` - Squash commits like GitHub PR merge
 - `/stylish-git:rebase` - Rebase with intelligent conflict resolution
 - `/stylish-git:cleanup-branch` - Branch cleanup and management
+- `/stylish-git:create-worktree` - Create isolated worktree for feature work
 
 ---
 
