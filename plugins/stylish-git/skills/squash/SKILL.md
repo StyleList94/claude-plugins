@@ -1,5 +1,8 @@
 ---
+name: squash
 description: Squash commits on branch like GitHub PR squash merge
+argument-hint: "[N]"
+tools: Bash, Read, AskUserQuestion
 ---
 
 # Squash Commits

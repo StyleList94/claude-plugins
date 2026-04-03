@@ -1,5 +1,8 @@
 ---
+name: figma-to-code
 description: Convert Figma designs to JSX/Astro components with Tailwind CSS (requires Figma MCP server)
+argument-hint: "[figma-url] [--react|--astro]"
+tools: Bash, Read, Write, Edit, Glob, Grep
 ---
 
 # Figma to Code Conversion

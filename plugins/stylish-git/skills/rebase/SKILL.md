@@ -1,5 +1,7 @@
 ---
+name: rebase
 description: Rebase branch with intelligent conflict resolution and force push
+tools: Bash, Read, Edit, AskUserQuestion
 ---
 
 Rebase current branch onto base branch with smart conflict resolution.
@@ -79,7 +81,7 @@ Conflict detected
 
 **Clean rebase:**
 ```
-/stylish-rebase
+/stylish-git:rebase
 → Current branch: feature/add-button
 → Fetching origin/main...
 → Rebasing onto origin/main...
@@ -90,7 +92,7 @@ Conflict detected
 
 **Lockfile conflict:**
 ```
-/stylish-rebase
+/stylish-git:rebase
 → Rebasing onto origin/main...
 → Conflict: package-lock.json (lockfile)
 → Auto-resolving: npm install...
@@ -100,7 +102,7 @@ Conflict detected
 
 **Code conflict (auto-resolved):**
 ```
-/stylish-rebase
+/stylish-git:rebase
 → Conflict: src/utils.ts
 → Analyzing... both sides add different imports
 → Merging: keeping all imports
@@ -110,7 +112,7 @@ Conflict detected
 
 **Code conflict (needs input):**
 ```
-/stylish-rebase
+/stylish-git:rebase
 → Conflict: src/api.ts
 → Same function modified differently on both sides
 → Showing both versions...
@@ -119,7 +121,7 @@ Conflict detected
 
 **Protected branch error:**
 ```
-/stylish-rebase
+/stylish-git:rebase
 → Error: Cannot rebase on protected branch 'main'
 → Switch to a feature branch first
 ```

@@ -1,5 +1,8 @@
 ---
+name: component-workflow
 description: Full component development workflow - Figma design to tested React component
+argument-hint: "[figma-url] [--react|--astro]"
+tools: Bash, Read, Write, Edit, Glob, Grep
 ---
 
 # Component Development Workflow
@@ -10,7 +13,7 @@ Orchestrate the complete component development process: from Figma design to pro
 
 ### Step 1: Design to Code
 
-Execute the `/stylish-figma-to-code` skill to:
+Execute the `/stylish-frontend:figma-to-code` skill to:
 
 - Extract design from Figma
 - Generate JSX/Astro component
@@ -28,9 +31,9 @@ After component generation:
 ### Step 3: Test Generation
 
 Once component is confirmed, ask:
-> "Component generated successfully. Would you like to generate tests with `/stylish-vitest-browser`?"
+> "Component generated successfully. Would you like to generate tests with `/stylish-frontend:vitest-browser`?"
 
-If user agrees, execute `/stylish-vitest-browser` to:
+If user agrees, execute `/stylish-frontend:vitest-browser` to:
 
 - Analyze component structure
 - Classify as Simple or Complex
@@ -41,11 +44,11 @@ If user agrees, execute `/stylish-vitest-browser` to:
 
 ```bash
 # Start the full workflow
-/stylish-component-workflow [figma-url-or-node-id]
+/stylish-frontend:component-workflow [figma-url-or-node-id]
 
 # With options
-/stylish-component-workflow [figma-url] --react
-/stylish-component-workflow [figma-url] --astro
+/stylish-frontend:component-workflow [figma-url] --react
+/stylish-frontend:component-workflow [figma-url] --astro
 ```
 
 ## Workflow Diagram

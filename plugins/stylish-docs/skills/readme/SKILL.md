@@ -1,5 +1,7 @@
 ---
+name: readme
 description: Generate StyleList94-style README.md based on project type
+tools: Bash, Read, Write, Edit, Glob, Grep
 ---
 
 Generate clean, practical README.md files tailored to project type.

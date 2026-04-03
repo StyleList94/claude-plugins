@@ -1,5 +1,8 @@
 ---
+name: react-tsdoc
 description: Generate TSDoc comments for React components and hooks
+argument-hint: "[file-path]"
+tools: Bash, Read, Edit, Glob, Grep
 ---
 
 Add TSDoc comments to React components and custom hooks.
