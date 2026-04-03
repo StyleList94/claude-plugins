@@ -21,6 +21,8 @@ When presenting component review results, use the format below.
 |----------|-------|
 | Accessibility | N |
 | Pattern | N |
+| Naming & Types | N |
+| State Matrix | N |
 | Structure | N |
 | Style | N |
 
@@ -38,11 +40,31 @@ When presenting component review results, use the format below.
 
 ---
 
-### Pattern Consistency
+### Pattern Issues
+
+ref handling, controlled/uncontrolled, compound components, props forwarding, API consistency.
 
 > **[ComponentName]** `[filepath:line]`
 > 
 > [what's inconsistent and what the project convention is]
+
+---
+
+### Naming & Type Issues
+
+> **[ComponentName]** `[filepath:line]`
+> 
+> [naming or type discipline issue]
+
+---
+
+### State Matrix Issues
+
+Uncovered or broken state combinations (variant × hover × disabled × checked, etc.).
+
+> **[ComponentName]** `[filepath:line]`
+> 
+> [which state combination is missing or broken]
 
 ---
 
@@ -58,7 +80,7 @@ When presenting component review results, use the format below.
 
 > **[ComponentName]** `[filepath:line]`
 > 
-> [Tailwind/CSS issue and fix]
+> [CSS/styling issue and fix]
 
 ---
 
