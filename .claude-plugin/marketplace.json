@@ -47,6 +47,19 @@
       "repository": "https://github.com/StyleList94/claude-plugins",
       "license": "MIT",
       "strict": false
+    },
+    {
+      "name": "stylish-review",
+      "source": "./plugins/stylish-review",
+      "description": "Interactive code review workflow with per-finding decisions",
+      "version": "0.1.0",
+      "category": "code-review",
+      "keywords": ["code-review", "review", "pr", "diff", "interactive", "claude-md", "walkthrough"],
+      "author": { "name": "StyleList94" },
+      "homepage": "https://github.com/StyleList94/claude-plugins",
+      "repository": "https://github.com/StyleList94/claude-plugins",
+      "license": "MIT",
+      "strict": false
     }
   ]
 }

@@ -18,6 +18,7 @@ Then install individual plugins:
 /plugin install stylish-git@stylish-code
 /plugin install stylish-docs@stylish-code
 /plugin install stylish-frontend@stylish-code
+/plugin install stylish-review@stylish-code
 ```
 
 ## Available Plugins
@@ -74,6 +75,18 @@ Frontend component development workflow tools.
 - `component-review-report` - Structured format for component review results
 
 > **Note:** `/stylish-frontend:figma-to-code` requires [Figma MCP Server](https://github.com/figma/mcp-server-guide).
+
+---
+
+### stylish-review
+
+Interactive code review workflow that runs the full review pipeline and walks you through each finding one-by-one.
+
+**Skills:**
+
+- `/stylish-review:code-review` - Interactive code review walkthrough (PR or local diff, per-finding apply/modify/defer/dismiss)
+
+> **Note:** Use the full path `/stylish-review:code-review` to disambiguate from the official `/code-review:code-review`, which is a one-shot, score-filtered, PR-comment-based reviewer. This skill is the interactive, no-filter variant.
 
 ## License
 
