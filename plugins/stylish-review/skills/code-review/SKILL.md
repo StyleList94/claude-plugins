@@ -47,6 +47,18 @@ Then:
 - If the diff is empty, exit with a friendly message: `No changes to review.` and stop.
 - If the diff exceeds ~5000 lines, warn the user and confirm via AskUserQuestion before proceeding. Large diffs cost a lot of agent runs; the user should opt in.
 - Dispatch a single Haiku agent to collect the **paths** (not contents) of relevant CLAUDE.md files: the repo root CLAUDE.md (if present) and any CLAUDE.md inside directories whose files were modified. The reviewers will read these directly when they need them.
+- Read the **user's global CLAUDE.md** (typically `~/.claude/CLAUDE.md`) once and extract any CLI tool conventions and house style rules. These travel with every subagent prompt below — see *Subagent dispatch conventions*.
+
+## Subagent dispatch conventions
+
+Subagents inherit nothing from the user's CLAUDE.md by default. Every dispatch prompt in Steps 3, 4, and 6 MUST include the following baseline so subagents behave consistently and don't trip safety warnings:
+
+- **Absolute working directory** — the absolute path of the target repo. Especially important for monorepos where directory names repeat (e.g. `<root>/imwebme/packages/packages/clay-ai-poc/...` is correct even though it looks like a typo).
+- **CLI tool conventions from the user's CLAUDE.md** — if the user's CLAUDE.md prefers specific replacements (e.g. `fd` over `find`, `rg` over `grep`, `eza` over `ls`, `bat` over `cat`), restate those rules in the subagent prompt. Subagents that violate them trip the harness's security warning system.
+- **Strict output format** — when expecting JSON, end the prompt with "Return ONLY the JSON, no prose." Subagents are chatty by default and will narrate unless told not to.
+- **Absolute paths only** — never use relative paths inside subagent prompts; subagents may resolve them against an unexpected CWD.
+
+Build a small reusable context block once after the Pre-flight step and prepend it to each subagent prompt.
 
 ## Step 3 — Five parallel review agents (Sonnet)
 
@@ -95,8 +107,10 @@ Attach the score to the finding as metadata. **Do not filter.** The goal is to i
 
 ## Step 5 — Normalize the finding list
 
+This step runs in the **main agent**, not a subagent — sort stability matters and delegating it produces non-deterministic ordering across runs.
+
 - Dedupe near-duplicates: findings on the same `file` whose `line_range` overlaps (or is within 3 lines) and whose descriptions describe the same issue → keep the one with the highest score, merge the others' evidence into the kept finding.
-- Sort by score descending. Ties broken by file path then line number.
+- Sort: `score` descending, ties broken by `file` ascending, then by the numeric start of `line_range` ascending. Apply this order explicitly in the main agent so identical inputs always produce the same display order.
 - If the resulting list has more than 30 findings, ask the user via AskUserQuestion: `View all`, `Top 30 only` (drop the rest for this run), or `Abort`.
 
 ## Step 6 — Pre-analysis (parallel Haiku)
@@ -165,6 +179,12 @@ Earlier fixes in the same file may have shifted line numbers. Before any Edit:
 
 Never silently apply an Edit when the location is uncertain.
 
+### Multi-site fixes — never use `replace_all`
+
+When the same fix applies to multiple identical occurrences in one file (e.g. the suggested change appears at lines 276 and 316 of the same file), do NOT use `Edit` with `replace_all=true`. Some workspace sandboxes (notably when the target file lives in a repo other than the one this Claude session was started in) reject bulk replacements while still permitting single-site edits. Bulk replacements are also harder to review.
+
+Instead, perform one Edit per site. Disambiguate each by including a few lines of unique surrounding context in the `old_string`/`new_string` pair, so each Edit matches exactly one location.
+
 ## Step 9 — Wrap-up
 
 After the loop ends, print a single summary block:
@@ -189,6 +209,8 @@ Don't write any report file. Deferred items remain `in_progress` in TaskList; th
 | No `main`/`master`/`develop` branch | Ask user for the base branch |
 | A reviewer agent returns nothing | Proceed with whatever the others found |
 | Line-shift makes Edit ambiguous | Stop, offer skip or manual edit |
+| Same fix at multiple sites in one file | One Edit per site with unique surrounding context — never `replace_all=true` |
+| Cross-repo target (reviewing PR in repo other than session-owned) | Subagents must use absolute paths; expect bulk-edit guardrails to reject `replace_all` |
 | User aborts via Ctrl+C mid-loop | Deferred items stay in TaskList; no cleanup needed |
 
 ## Why the design looks like this
