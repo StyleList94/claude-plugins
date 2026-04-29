@@ -18,6 +18,7 @@
 /plugin install stylish-git@stylish-code
 /plugin install stylish-docs@stylish-code
 /plugin install stylish-frontend@stylish-code
+/plugin install stylish-review@stylish-code
 ```
 
 ## 사용 가능한 플러그인
@@ -76,6 +77,16 @@ Git 워크플로우 도구 모음.
 - `component-review-report` - 컴포넌트 리뷰 결과 구조화 포맷
 
 > **참고:** `/stylish-frontend:figma-to-code`는 [Figma MCP Server](https://github.com/figma/mcp-server-guide) 설정이 필요합니다.
+
+---
+
+### stylish-review
+
+인터랙티브 코드 리뷰. 전체 리뷰 파이프라인을 돌리고 finding을 한 건씩 직접 결정합니다.
+
+**스킬:**
+
+- `/stylish-review:code-review` - 인터랙티브 코드 리뷰 워크스루 (PR 또는 로컬 diff, finding마다 적용/수정/대기/오탐 종결)
 
 ## 라이선스
 
