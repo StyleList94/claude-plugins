@@ -88,8 +88,6 @@ Git 워크플로우 도구 모음.
 
 - `/stylish-review:code-review` - 인터랙티브 코드 리뷰 워크스루 (PR 또는 로컬 diff, finding마다 적용/수정/대기/오탐 종결)
 
-> **참고:** 공식 `/code-review:code-review`(점수로 필터링하고 PR 코멘트로 게시하는 일회성 리뷰어)와 구분되도록 항상 풀패스 `/stylish-review:code-review`로 호출하세요. 이 스킬은 필터 없이 모든 finding을 사용자가 직접 처리하는 인터랙티브 변형입니다.
-
 ## 라이선스
 
 MIT

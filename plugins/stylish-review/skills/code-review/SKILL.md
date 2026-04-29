@@ -62,16 +62,28 @@ Build a small reusable context block once after the Pre-flight step and prepend 
 
 ## Step 3 — Five parallel review agents (Sonnet)
 
-Dispatch all five reviewers in parallel — one message, five Agent tool calls. Each reviewer returns a flat list of findings shaped like:
+Dispatch all five reviewers in parallel — one message, five Agent tool calls. Each reviewer returns a flat list of findings matching this shape:
+
+```typescript
+type Finding = {
+  file: string;        // path relative to repo root
+  line_range: string;  // e.g. "42-47"
+  category: "bug" | "claude-md" | "history" | "comments" | "past-prs";
+  description: string; // one paragraph
+  evidence: string;    // quoted code or doc snippet
+};
+```
+
+Example output:
 
 ```json
 [
   {
-    "file": "path/to/file.ts",
+    "file": "src/auth.ts",
     "line_range": "42-47",
-    "category": "bug | claude-md | history | comments | past-prs",
-    "description": "<one paragraph>",
-    "evidence": "<quoted code or doc snippet>"
+    "category": "bug",
+    "description": "Missing null check on token before accessing expires field.",
+    "evidence": "if (token.expires < Date.now()) { ... }"
   }
 ]
 ```
@@ -118,17 +130,17 @@ This step runs in the **main agent**, not a subagent — sort stability matters 
 For every surviving finding, dispatch one Haiku agent in parallel that:
 
 1. Uses Read to load the relevant lines of the file as they exist right now.
-2. Returns a structured pre-analysis:
+2. Returns a structured pre-analysis matching this shape:
 
-```json
-{
-  "validity_assessment": "seems valid | partially valid | questionable | likely false positive",
-  "suggested_fix": {
-    "before": "<current code>",
-    "after": "<proposed code>",
-    "rationale": "<one sentence>"
-  } | null
-}
+```typescript
+type PreAnalysis = {
+  validity_assessment: "seems valid" | "partially valid" | "questionable" | "likely false positive";
+  suggested_fix: {
+    before: string;     // current code
+    after: string;      // proposed code
+    rationale: string;  // one short sentence
+  } | null;
+};
 ```
 
 `suggested_fix` should be `null` only when there is no concrete change to propose (e.g. the finding is purely informational). The before/after must be small and focused — just the lines that change.

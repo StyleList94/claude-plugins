@@ -86,8 +86,6 @@ Interactive code review workflow that runs the full review pipeline and walks yo
 
 - `/stylish-review:code-review` - Interactive code review walkthrough (PR or local diff, per-finding apply/modify/defer/dismiss)
 
-> **Note:** Use the full path `/stylish-review:code-review` to disambiguate from the official `/code-review:code-review`, which is a one-shot, score-filtered, PR-comment-based reviewer. This skill is the interactive, no-filter variant.
-
 ## License
 
 MIT
