@@ -19,6 +19,7 @@ Then install individual plugins:
 /plugin install stylish-docs@stylish-code
 /plugin install stylish-frontend@stylish-code
 /plugin install stylish-review@stylish-code
+/plugin install stylish-packages@stylish-code
 ```
 
 ## Available Plugins
@@ -85,6 +86,16 @@ Interactive code review workflow that runs the full review pipeline and walks yo
 **Skills:**
 
 - `/stylish-review:code-review` - Interactive code review walkthrough (PR or local diff, per-finding apply/modify/defer/dismiss)
+
+---
+
+### stylish-packages
+
+Smart bulk dependency updates that protect frameworks and align `@types/node` with the latest Node major actually installed on the machine.
+
+**Skills:**
+
+- `/stylish-packages:update` - Bulk-update deps across npm/pnpm/yarn/bun. Auto-bumps safe patches/minors, asks per-package for majors, holds back frameworks (TypeScript, Next.js, React, etc.) and self-upgrading packages (Storybook, Prisma, shadcn, etc.) with the right CLI hint.
 
 ## License
 
