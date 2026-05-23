@@ -60,6 +60,19 @@
       "repository": "https://github.com/StyleList94/claude-plugins",
       "license": "MIT",
       "strict": false
+    },
+    {
+      "name": "stylish-packages",
+      "source": "./plugins/stylish-packages",
+      "description": "Smart bulk dependency updates with framework exclusions and Node-aware @types/node alignment",
+      "version": "0.1.0",
+      "category": "dependencies",
+      "keywords": ["dependencies", "npm", "pnpm", "yarn", "bun", "update", "upgrade", "outdated", "types-node", "smart-update"],
+      "author": { "name": "StyleList94" },
+      "homepage": "https://github.com/StyleList94/claude-plugins",
+      "repository": "https://github.com/StyleList94/claude-plugins",
+      "license": "MIT",
+      "strict": false
     }
   ]
 }
