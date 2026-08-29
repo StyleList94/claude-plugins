@@ -39,8 +39,11 @@ awk -F'\t' '{print $1}' "$S" | sort | uniq -c | sort -rn | head -5   # authors
 **Pitfalls. Each of these has produced a wrong reading in practice:**
 
 - **Bots.** A mainline that is half automated version bumps halves every ratio you compute. The filter above catches the common naming patterns; the author histogram is printed so you can spot the ones it misses and re-filter by name.
+- **The filter has to reach every axis, not just the subjects.** Any axis measured by a second, unfiltered `git log` quietly readmits the bots. Measured on a bot-heavy repo, an unfiltered body axis reported a median body of 1 line where the human median was 10 - and a 1-line median is exactly what tells the skill "this repo does not use bodies". Compare the sample sizes across axes; if they differ, an axis is unfiltered.
 - **Merge commits.** `--no-merges` is not optional - nobody wrote those subjects.
 - **Squash detection.** Do not conclude "squash-merged" from a `(#N)` subject suffix. Whether it appears depends on the PR title convention, so it can be absent in a repo that squashes every PR. Use parent counts, and treat `(#N)` as a secondary signal only.
+- **Trailers are not a body.** A commit whose body is only `Co-authored-by:` or `Signed-off-by:` lines registers as having one. In a repo that adds a co-author trailer to every squash this reads as near-total body usage with a median of 1 line - the same false signal as an unfiltered bot. Strip them before deciding a body exists.
+- **Never use NUL as an awk record separator.** `RS="\0"` is an empty string to awk, which silently switches it to paragraph mode and splits on blank lines instead. It does not error; it returns a plausible number. It reported 100% body usage against a true 41%. Use `\001`.
 
 ### 2. Read the axes
 
@@ -62,9 +65,15 @@ LC_ALL=C awk '{s=$0; gsub(/[\300-\377][\200-\277]*/,"x",s); print length(s)}' "$
 echo "types:";  sed -n 's/^\([A-Za-z][A-Za-z]*\)\(([^)]*)\)\{0,1\}!\{0,1\}:.*/\1/p' "$S.subj" | sort | uniq -c | sort -rn | head -8
 echo "scopes:"; sed -n 's/^[A-Za-z][A-Za-z]*(\([^)]*\))!\{0,1\}:.*/\1/p'             "$S.subj" | sort | uniq -c | sort -rn | head -8
 
-# body usage. \001 as the record separator, because awk reads RS="\0" as paragraph mode
-git log --no-merges -n "$N" --pretty=format:'%x01%b' \
-  | awk 'BEGIN{RS="\001"} NR>1 {t++; s=$0; gsub(/^[ \n]+|[ \n]+$/,"",s); if (s!="") {w++; print split(s,a,"\n") > "/dev/stderr"}} END {printf "with body          : %d%%\n", (t?100*w/t:0)}' 2>"$S.body"
+# body usage. Carries author and email so the SAME filter applies, and strips trailers.
+git log --no-merges -n "$N" --pretty=format:'%x01%an%x02%ae%x02%b' \
+  | awk 'BEGIN{RS="\001"; FS="\002"} NR>1 {
+      if ($1 ~ /\[.*[Bb]ot.*\]|[-_ ][Bb]ot$/ || $2 ~ /\[.*bot.*\]|bot@|actions@github\.com/) next
+      t++; n=split($3, L, "\n"); b=""
+      for (i=1;i<=n;i++) if (tolower(L[i]) !~ /^(co-authored-by|signed-off-by|co-committed-by):/) b = b L[i] "\n"
+      gsub(/^[ \n]+|[ \n]+$/,"",b)
+      if (b != "") {w++; print split(b,a,"\n") > "/dev/stderr"}
+    } END {printf "with body          : %d%%\n", (t?100*w/t:0)}' 2>"$S.body"
 sort -n "$S.body" | awk '{v[NR]=$1} END {if (NR) printf "body lines present : median %d\n", v[int((NR+1)/2)]}'
 
 # how branch work lands on the mainline
