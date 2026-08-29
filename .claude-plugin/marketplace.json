@@ -13,7 +13,7 @@
       "name": "stylish-git",
       "source": "./plugins/stylish-git",
       "description": "Git workflow tools that write commits in the target repository's own measured voice",
-      "version": "2.2.0",
+      "version": "2.3.0",
       "category": "git",
       "keywords": ["git", "commit", "rebase", "squash", "conventional-commits", "branch-cleanup", "worktree", "pull-request", "pr-summary"],
       "author": { "name": "StyleList94" },

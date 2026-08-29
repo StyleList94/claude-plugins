@@ -33,7 +33,7 @@ Git 워크플로우 도구 모음.
 **스킬:**
 
 - `/stylish-git:commit` - 레포 히스토리에서 측정한 그 레포다운 커밋 메시지
-- `/stylish-git:pr-summary` - PR 요약 생성기
+- `/stylish-git:pr-summary` - diff가 아니라 세션이 아는 것으로 PR 본문 작성
 - `/stylish-git:squash` - 브랜치를 한 커밋으로 합치기, 커밋 목록 body 없음
 - `/stylish-git:rebase` - 지능형 충돌 해결 리베이스
 - `/stylish-git:cleanup-branch` - 브랜치 정리 및 관리

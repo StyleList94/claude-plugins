@@ -1,158 +1,176 @@
 ---
 name: pr-summary
-description: Generate a PR summary from the branch's commits, then copy it to the clipboard or upload it to the PR (create or update)
+description: Write a PR body from what the working session knows, then copy it to the clipboard or upload it to the PR (create or update)
 argument-hint: "[upload]"
 tools: Bash, Read, Grep, AskUserQuestion
 ---
 
 # PR Summary
 
-Generate a pull request summary from the current branch's work and either copy it to the clipboard (default) or upload it directly (`upload` argument).
+Write the pull request body for the current branch, then copy it to the clipboard (default) or upload it (`upload` argument).
 
-**Language rule:**
-- The PR **title** follows the commit convention **measured from this repository** (see the `commit` skill, Layer 1) — it becomes the squash-merge commit subject, so it must read like the repo's own history.
-- The PR **body** is written in the **user's working language** — match the language the user is conversing in, and render the section headers in that language.
-- Communicate with the user in that same language.
+## The input is the session, not the branch
 
-This skill is meant to run inside a Claude-generated worktree, where the current branch is the feature branch.
+`git log` and `git diff` show what changed. They cannot show:
+
+- **the causal chain** - the code is the result, not the reason the result happened
+- **what was measured** while working, and what it showed
+- **which alternatives were considered and rejected**, and why
+- **what else was closed** along the way, or deliberately left alone
+
+That is the material worth reading, and it exists only in the working session.
+
+> **The session is the primary input. Git is the check.** Use the log and the diff to confirm the body is complete and accurate - never as the source it is derived from.
+
+A skill that reads only git cannot escape producing a list of changes, and the diff already shows that list.
+
+**Corollary - run this while the reasoning is still in hand**, before the branch is wrapped up, not as a final step that re-derives everything from the log. Once only the log remains, the cause, the measurements and the rejected alternatives are gone. This is the same constraint as the `commit` skill's "draft the review-surface description first": this body is where the evidence lives, and with no home the evidence gets parked in commit messages instead.
+
+## Shape
+
+One shape for every PR. **Do not branch on feature / fix / chore.** Type detection is unreliable, and a per-type template forces empty slots to be filled.
+
+### 1. What was done and why - one to three sentences
+
+For most PRs this is the entire body. Write it and stop.
+
+Where the work is a set of distinct mechanism changes that prose cannot carry, this part may be a short list - at the level of **mechanism**, never of file or commit.
+
+### 2. What the diff cannot show - only when it exists
+
+Four optional slots. Each fills on its own or stays empty. **Never prompt for one that is absent, and never emit an empty heading or "N/A".** Omit the whole part when no slot has content.
+
+| Slot | Content | Fills for |
+|---|---|---|
+| cause | what produced this behavior, as a chain | a bug fix |
+| judgment | why this approach, and what was rejected | a feature |
+| evidence | what was measured or verified this time | anything tested |
+| side effects | what else closed, or was left on purpose | an investigation |
+
+The work type decides which slots have content. The skill never needs to know the type.
+
+### Rules
+
+- **Brevity is what this skill sells.** The forge already auto-generates a list of commit subjects. What earns this body its place is the handful of things only the session knows. A large template creates pressure to fill it, and that pressure is what produces padded bodies.
+- **No section without content.** Same principle as the `commit` skill's "never invent a convention the repository does not already have".
+- **No per-change bullet list.** The diff shows what changed.
+- **Language.** Write the body, and its headings, in the user's working language. Communicate with the user in that language too.
 
 ## Step 1: Gather context
 
 ```bash
-git_root=$(git rev-parse --show-toplevel)
 branch=$(git rev-parse --abbrev-ref HEAD)
-default_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main")
+default_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo main)
 
-git log --oneline "origin/${default_branch}..HEAD"      # commits to summarize
-git diff --stat "origin/${default_branch}...HEAD"        # changed files overview
-git diff "origin/${default_branch}...HEAD"               # full diff for analysis
+git log --oneline "origin/${default_branch}..HEAD"
+git diff --stat "origin/${default_branch}...HEAD"
+git diff "origin/${default_branch}...HEAD"
 ```
 
-- If `branch` equals `default_branch`, or there are no commits ahead, stop and tell the user there is nothing to summarize.
+If `branch` equals `default_branch`, or nothing is ahead, stop and say so.
 
-## Step 2: Validate branch convention
+Read the diff to **check** the body you are about to write: everything user-visible in it should be accounted for, and nothing in the body should contradict it. Do not derive the body from it.
 
-Branch names must match `<prefix>/<kebab-case>`.
+## Step 2: Check the branch name against the repo's own pattern
 
-| Prefix | Purpose |
-|--------|---------|
-| `feature/` | New feature |
-| `fix/` | Bug fix |
-| `chore/` | Maintenance, refactoring |
-| `docs/` | Documentation |
+Measure the naming actually in use rather than applying a list from elsewhere:
 
-Regex: `^(feature|fix|chore|docs)/[a-z0-9._-]+$`
+```bash
+git branch -r --format='%(refname:short)' | sed 's@^origin/@@' \
+  | awk -F/ 'NF>1 {print $1}' | sort | uniq -c | sort -rn | head -8
+```
 
-If the branch does **not** match, warn the user and suggest a compliant name based on the work. Do **not** block — continue with the summary.
+If the current branch departs from the observed pattern, say so and suggest a name that fits it. **Do not block** - report and continue.
 
-## Step 3: Build the title (repository's measured commit form)
+## Step 3: Build the title in the repository's measured form
 
-Run Layer 1 of the `commit` skill against this repository and write the title in the form it reports — language, prefix style, scope usage, case, and length target. Do not assume a convention the repo does not have.
+Run Layer 1 of the `commit` skill against this repository and write the title in the form it reports: language, prefix style, scope usage, case, and length target. Do not assume a convention the repo does not have.
 
-- If the repo uses a `type` prefix, use the dominant change type across the branch, drawn from the type vocabulary the repo actually uses
+- If the repo uses a `type` prefix, use the dominant change type across the branch, drawn from the repo's own type vocabulary
 - Attach a scope only if the repo scopes its subjects, and only from its existing scope vocabulary
-- This is a **squash merge**, so the subject must be **comprehensive** — cover the whole branch in one line, not a single commit
-- Never append a `(#N)` PR reference; the merge adds it
+- Never append a `(#N)` reference - the merge adds it
 
-## Step 4: Build the body (feature-oriented)
+**Measure how the branch will land** rather than assuming squash:
 
-Write the body in the **body language** (see the Language rule), and render the section headers in that language using this mapping:
-
-| Section | Korean header | English header |
-|---------|---------------|----------------|
-| Summary | `## 요약` | `## Summary` |
-| Related issue | `## 관련 이슈` | `## Related Issues` |
-| Changes | `## 변경 사항` | `## Changes` |
-| Review points | `## 리뷰 포인트` | `## Review Notes` |
-| Test | `## 테스트` | `## Test Plan` |
-
-Section order: Summary → Related issue → Changes → Review points → Test. **Always include Summary and Changes. Omit any other section that has no content.**
-
-Example (Korean body):
-
-```markdown
-## 요약
-<무엇을, 왜 — 1~3문장>
-
-## 변경 사항
-* <type>: <피처 설명>
-* <type>: <피처 설명>
-
-## 리뷰 포인트
-- <리뷰어가 집중해서 볼 곳>
+```bash
+git log -n 400 --pretty=format:'%p' | awk '{c[NF]++} END {for (k in c) printf "%s-parent: %d\n", k, c[k]}'
 ```
 
-Rules:
-- **Changes** — do **not** list commits one-by-one. Analyze the commits + diff and **group related changes into feature-level bullets**. Keep the `type:` prefix; write the description in the body language. Fold trivial commits (test/chore busywork) into the related feature or drop them.
-- **Related issue** — include only when an issue number is detectable (e.g. `#12` in the branch name or commit messages). Use `Closes #N`. Otherwise omit the section.
-- **Review points** — derive from the diff: complex logic, trade-offs, risky or wide-reaching changes. Omit if nothing is genuinely notable.
-- **Test** — checklist of how to verify. Omit if not applicable.
+Nearly all 1-parent means the branch is squashed or rebased, so this title becomes the whole branch's entry in the history and must cover the branch as a unit. A substantial share of 2-parent commits means the individual commits survive and the title names the merge. A repo may be mixed; when it is, write the title as if it will be squashed.
 
-## Step 5: Push the branch (both modes)
+## Step 4: Write the body
 
-The branch must exist on the remote before a PR can be opened — whether the user opens it manually (copy mode) or this skill opens it (`upload` mode). Push in **both** modes.
+Follow the shape above, in the user's working language. Include only the parts that have content.
 
-**Safety guard — verify the upstream before pushing.** If a feature branch was created without `--no-track`, its upstream can point at `origin/<default_branch>` (e.g. `origin/main`). A bare `git push` would then push feature commits straight onto the default branch. So check the upstream first and **stop** on any mismatch.
+## Step 5: Detect an existing PR
+
+A PR for this branch may already be open, so the same invocation creates the first time and updates afterward:
+
+```bash
+pr_url=$(gh pr view --json url --jq '.url' 2>/dev/null || true)
+```
+
+## Step 6: The branch must reach the remote - and that is the user's call
+
+A PR cannot be opened for a branch the remote does not have. **Sending it there is the user's decision, and this skill never makes it silently.** Ask explicitly, and keep working when the answer is no.
+
+First, the upstream guard. A branch created without `--no-track` can end up tracking the default branch, and a bare send would land feature commits on it:
 
 ```bash
 upstream=$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null || true)
+remote_has=$(git ls-remote --heads origin "$branch" 2>/dev/null)
 
-if [ -z "$upstream" ]; then
-  # No upstream → create a same-named tracking branch on origin (safe)
-  git push -u origin "$branch"
-elif [ "$upstream" = "origin/$branch" ]; then
-  # Correctly tracking its own remote branch
-  git push
-else
-  # Mis-tracked (e.g. origin/main). Pushing here would corrupt the wrong branch — STOP.
-  echo "STOP: '$branch' is tracking '$upstream', not 'origin/$branch'."
-  echo "      A push would land on '$upstream' (e.g. corrupting origin/main)."
+if [ -n "$upstream" ] && [ "$upstream" != "origin/$branch" ]; then
+  echo "STOP: '$branch' tracks '$upstream', not 'origin/$branch'."
+  echo "      Sending it would land these commits on '$upstream'."
   echo "      Fix: git branch --unset-upstream   then re-run."
 fi
 ```
 
-Do **not** continue to the dispatch step if the guard stopped (mis-tracked upstream). Report the problem to the user and let them fix the tracking first.
+Stop on a mismatch and report it - do not continue to the dispatch step.
 
-## Step 6: Detect an existing PR
-
-A PR for this branch may already be open (e.g. scope expanded after review). Detect it so the skill is idempotent — the same invocation creates a PR the first time and updates it afterward.
+Otherwise, if `remote_has` is empty or the branch is behind its remote counterpart, show the user the exact command and ask for approval:
 
 ```bash
-pr_url=$(gh pr view --json url --jq '.url' 2>/dev/null || true)   # empty when no PR exists for this branch
+git push -u origin "$branch"      # no upstream yet
+git push                          # already tracking origin/$branch
 ```
 
-## Step 7: Dispatch by mode
+If the user declines, or the session cannot ask, **do not send anything**. Fall through to copy mode, hand over the body, and say that the branch still has to reach the remote before a PR can be opened.
 
-**Default (no argument) — copy mode:**
+## Step 7: Dispatch
 
-Because of squash merge, put the **title at the very top** of the clipboard, then a blank line, then the body.
+**Default - copy mode:**
+
+The title goes on the first line, because in a squashing repo it becomes the commit subject:
 
 ```bash
 printf '%s\n\n%s\n' "$title" "$body" | pbcopy
 ```
 
-- Print the title separately in the terminal so the user can paste it into the GitHub title field.
-- Tell the user that the summary is copied and the branch is pushed. If `pr_url` is set, point them at the existing PR to paste into; otherwise tell them they can open a new PR.
+Print the title separately so it can be pasted into the title field. If `pr_url` is set, point the user at the existing PR; otherwise tell them a new one can be opened.
 
-**`upload` argument — create or update:**
+**`upload` argument:**
 
-- **No PR exists** (`pr_url` empty) → create a new one:
+Requires the branch on the remote (step 6). If it did not get there, fall back to copy mode.
+
+- No PR yet:
 
   ```bash
   gh pr create --base "$default_branch" --head "$branch" --title "$title" --body "$body"
   ```
 
-- **PR already exists** (`pr_url` set) → update it. `gh pr edit` **overwrites** the body, so any manual edits or checked boxes are lost. Show the regenerated title + body and **confirm with the user before editing**. On confirmation:
+- PR exists: `gh pr edit` **overwrites** the body, discarding manual edits and checked boxes. Show the regenerated title and body and confirm before editing.
 
   ```bash
   gh pr edit --title "$title" --body "$body"
   ```
 
-  If the user declines the overwrite, fall back to copy mode (`pbcopy`) so they can merge the changes into the existing PR by hand.
+  If the user declines, fall back to copy mode so they can merge the changes by hand.
 
-- Report the PR URL.
+Report the PR URL.
 
 ## Notes
 
-- This skill pushes the branch and summarizes (and, in `upload` mode, opens or updates the PR) — it never commits or merges.
-- Title is English (commit convention); body follows the user's working language.
+- This skill writes a summary and, with approval, opens or updates a PR. It never commits and never merges.
+- The title follows the repository's measured commit form; the body follows the user's working language.

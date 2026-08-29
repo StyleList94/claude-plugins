@@ -31,7 +31,7 @@ Git workflow tools for streamlined version control operations.
 **Skills:**
 
 - `/stylish-git:commit` - Commit messages in the repository's own measured voice
-- `/stylish-git:pr-summary` - PR summary generator
+- `/stylish-git:pr-summary` - PR body from what the session knows, not just the diff
 - `/stylish-git:squash` - Squash a branch into one commit, no commit-list body
 - `/stylish-git:rebase` - Rebase with intelligent conflict resolution
 - `/stylish-git:cleanup-branch` - Branch cleanup and management
