@@ -1,13 +1,13 @@
 ---
 name: squash
-description: Squash commits on branch like GitHub PR squash merge
+description: Squash commits on branch into one, with a message in the repository's own voice
 argument-hint: "[N]"
 tools: Bash, Read, AskUserQuestion
 ---
 
 # Squash Commits
 
-Squash multiple commits into a single commit with GitHub PR squash merge style message.
+Squash multiple commits into a single commit.
 
 ## Use Case
 
@@ -24,15 +24,28 @@ Squash multiple commits into a single commit with GitHub PR squash merge style m
 
 ## Commit Message Format
 
-Same format as GitHub PR squash merge:
-
 ```text
-<user-provided title>
+<subject>
 
-* <commit1 message> (oldest)
-* <commit2 message>
-* <commit3 message> (newest)
+<body - only when a constraint must be preserved>
 ```
+
+**Do not build a body listing the commits being squashed.** The squash is what discards those
+messages; writing them back into the body reinstates exactly what the squash removed, and the
+individual commits are not reachable afterwards to make the list verifiable. The list carries
+nothing a reader could not get from the PR.
+
+Follow the `commit` skill for everything else:
+
+- **Form** - subject language, prefix style, scope usage, case and length come from Layer 1 of
+  the `commit` skill, measured against this repository. Do not assume a convention.
+- **Body** - only when there is a constraint a future editor of this code must preserve
+  (Layer 2, about three lines). Otherwise the subject is the whole message.
+- **Evidence** - measurements, verification and alternatives go in the PR/MR description, not
+  in the squashed commit.
+
+Because the squashed subject becomes the whole branch's entry in the history, it must cover
+the branch as a unit rather than describing whichever commit happened to be last.
 
 ## Process
 
@@ -41,10 +54,12 @@ Same format as GitHub PR squash merge:
    - No argument: Find merge base with `git merge-base origin/<base> HEAD`
    - Numeric argument: Use `HEAD~N`
 3. **Show commits**: Display commits to squash (chronological order)
-4. **Get title**: Ask user for commit title (using AskUserQuestion)
-5. **Build message**: Generate title + commit list body
-6. **Execute squash**: `git reset --soft <target> && git commit`
-7. **Done**: Show push instructions (user pushes manually)
+4. **Measure the repo**: Run Layer 1 of the `commit` skill so the subject matches this repo
+5. **Get title**: Ask the user for the subject (using AskUserQuestion), offering a measured-form
+   suggestion that covers the whole branch
+6. **Build message**: Subject alone, plus a constraint body only when one exists
+7. **Execute squash**: `git reset --soft <target> && git commit`
+8. **Done**: Show push instructions (user pushes manually)
 
 ## Execution Steps
 
@@ -55,20 +70,15 @@ Same format as GitHub PR squash merge:
    - No argument: `git merge-base origin/<base> HEAD`
    - Argument N: `HEAD~N`
 5. Show commits with `git log --oneline --reverse <target>..HEAD` (chronological)
-6. Ask user for commit title (using AskUserQuestion)
-7. Build commit message:
-
-   ```text
-   <title>
-
-   * <commit1 subject>
-   * <commit2 subject>
-   ...
-   ```
-
-8. Run `git reset --soft <target>`
-9. Run `git commit` with HEREDOC for message
-10. Show completion message and push instructions
+6. Measure the repository's commit form (`commit` skill, Layer 1)
+7. Ask the user for the subject (using AskUserQuestion)
+8. Build the commit message:
+   - Subject line
+   - A body only when the branch leaves behind a constraint worth recording, about three lines
+   - Never a list of the squashed commits
+9. Run `git reset --soft <target>`
+10. Run `git commit` with HEREDOC for message
+11. Show completion message and push instructions
 
 ## Safety Features
 
@@ -76,6 +86,9 @@ Same format as GitHub PR squash merge:
 - **No auto-push**: Only squash, user pushes manually
 
 ## Examples
+
+Subjects below are written in the form measured from the example repository. In a repository
+with a different measured form, the same skill produces a subject in that form instead.
 
 **Squash all commits:**
 
@@ -89,7 +102,9 @@ Same format as GitHub PR squash merge:
    2. def5678 fix: button style
    3. ghi9012 refactor: clean up
 
--> Enter commit title: feat: add button component with styling
+-> Measured profile: conventional prefix 97% · scope 5% · lowercase · median 24 / p90 37
+
+-> Enter subject: feat: add button component with styling
 
 -> Squashing...
 -> Squashed 3 commits
@@ -97,38 +112,29 @@ Same format as GitHub PR squash merge:
 -> Final commit message:
    +----------------------------------------
    | feat: add button component with styling
-   |
-   | * feat: add button component
-   | * fix: button style
-   | * refactor: clean up
    +----------------------------------------
 
 -> Run 'git push --force-with-lease' to update remote
 ```
 
-**Squash last N commits:**
+**Squash with a constraint worth recording:**
 
 ```text
 /stylish-git:squash 2
 
--> Current branch: feature/add-button
--> Squashing last 2 commits
 -> Commits to squash (2):
    1. def5678 fix: button style
    2. ghi9012 refactor: clean up
 
--> Enter commit title: fix: improve button styling
-
--> Squashing...
--> Squashed 2 commits
+-> Enter subject: fix: improve button styling
 
 -> Final commit message:
-   +----------------------------------------
+   +--------------------------------------------------------------
    | fix: improve button styling
    |
-   | * fix: button style
-   | * refactor: clean up
-   +----------------------------------------
+   | The focus ring is drawn with an outline rather than a shadow
+   | because the shadow is clipped by the parent's overflow.
+   +--------------------------------------------------------------
 
 -> Run 'git push --force-with-lease' to update remote
 ```

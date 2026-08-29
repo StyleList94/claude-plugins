@@ -10,8 +10,8 @@ tools: Bash, Read, Grep, AskUserQuestion
 Generate a pull request summary from the current branch's work and either copy it to the clipboard (default) or upload it directly (`upload` argument).
 
 **Language rule:**
-- The PR **title** always follows the commit convention and is **English** — it becomes the squash-merge commit subject.
-- The PR **body** is written in the **user's working language** — match the language the user is conversing in (Korean → Korean, English → English), and render the section headers in that language.
+- The PR **title** follows the commit convention **measured from this repository** (see the `commit` skill, Layer 1) — it becomes the squash-merge commit subject, so it must read like the repo's own history.
+- The PR **body** is written in the **user's working language** — match the language the user is conversing in, and render the section headers in that language.
 - Communicate with the user in that same language.
 
 This skill is meant to run inside a Claude-generated worktree, where the current branch is the feature branch.
@@ -45,14 +45,14 @@ Regex: `^(feature|fix|chore|docs)/[a-z0-9._-]+$`
 
 If the branch does **not** match, warn the user and suggest a compliant name based on the work. Do **not** block — continue with the summary.
 
-## Step 3: Build the title (English, commit convention)
+## Step 3: Build the title (repository's measured commit form)
 
-Follow the `commit` skill convention exactly:
+Run Layer 1 of the `commit` skill against this repository and write the title in the form it reports — language, prefix style, scope usage, case, and length target. Do not assume a convention the repo does not have.
 
-- Format: `<type>(<scope>): <subject>`
-- English only, all lowercase, imperative mood, no trailing period, subject under ~50 characters
+- If the repo uses a `type` prefix, use the dominant change type across the branch, drawn from the type vocabulary the repo actually uses
+- Attach a scope only if the repo scopes its subjects, and only from its existing scope vocabulary
 - This is a **squash merge**, so the subject must be **comprehensive** — cover the whole branch in one line, not a single commit
-- `type` = the dominant change type across the branch (feat / fix / refactor / chore / docs / ...)
+- Never append a `(#N)` PR reference; the merge adds it
 
 ## Step 4: Build the body (feature-oriented)
 
