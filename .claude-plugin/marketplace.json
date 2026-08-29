@@ -5,15 +5,13 @@
     "email": "me@stylelist94.dev"
   },
   "metadata": {
-    "description": "Stylish productivity plugins for Claude Code",
-    "version": "2.0.0"
+    "description": "Stylish productivity plugins for Claude Code"
   },
   "plugins": [
     {
       "name": "stylish-git",
       "source": "./plugins/stylish-git",
       "description": "Git workflow tools that write commits in the target repository's own measured voice",
-      "version": "2.3.0",
       "category": "git",
       "keywords": ["git", "commit", "rebase", "squash", "conventional-commits", "branch-cleanup", "worktree", "pull-request", "pr-summary"],
       "author": { "name": "StyleList94" },
@@ -26,7 +24,6 @@
       "name": "stylish-docs",
       "source": "./plugins/stylish-docs",
       "description": "Documentation generator and reviewer for README and React TSDoc",
-      "version": "2.0.0",
       "category": "documentation",
       "keywords": ["docs", "documentation", "tsdoc", "readme", "review"],
       "author": { "name": "StyleList94" },
@@ -39,7 +36,6 @@
       "name": "stylish-frontend",
       "source": "./plugins/stylish-frontend",
       "description": "Frontend component development workflow: Figma to code, testing, review, and orchestration",
-      "version": "2.0.0",
       "category": "frontend",
       "keywords": ["frontend", "react", "figma", "vitest", "testing", "components", "tailwind", "workflow", "accessibility"],
       "author": { "name": "StyleList94" },
@@ -52,7 +48,6 @@
       "name": "stylish-review",
       "source": "./plugins/stylish-review",
       "description": "Interactive code review workflow with per-finding decisions",
-      "version": "0.1.0",
       "category": "code-review",
       "keywords": ["code-review", "review", "pr", "diff", "interactive", "claude-md", "walkthrough"],
       "author": { "name": "StyleList94" },
@@ -65,7 +60,6 @@
       "name": "stylish-packages",
       "source": "./plugins/stylish-packages",
       "description": "Smart bulk dependency updates with framework exclusions and Node-aware @types/node alignment",
-      "version": "0.1.0",
       "category": "dependencies",
       "keywords": ["dependencies", "npm", "pnpm", "yarn", "bun", "update", "upgrade", "outdated", "types-node", "smart-update"],
       "author": { "name": "StyleList94" },
