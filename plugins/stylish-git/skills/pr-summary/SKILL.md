@@ -76,9 +76,12 @@ Read the diff to **check** the body you are about to write: everything user-visi
 Measure the naming actually in use rather than applying a list from elsewhere:
 
 ```bash
-git branch -r --format='%(refname:short)' | sed 's@^origin/@@' \
-  | awk -F/ 'NF>1 {print $1}' | sort | uniq -c | sort -rn | head -8
+bash "${CLAUDE_SKILL_DIR}/scripts/branch-prefixes.sh"
 ```
+
+The aggregation lives in a script because a skill body is rewritten by slash-command argument
+substitution before it reaches you - a `$` followed by a digit becomes the words the user passed,
+and awk field references have that exact shape. Do not inline awk here.
 
 If the current branch departs from the observed pattern, say so and suggest a name that fits it. **Do not block** - report and continue.
 

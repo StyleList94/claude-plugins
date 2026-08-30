@@ -23,62 +23,33 @@ If it does not use scopes, do not attach one. If its subjects run long, do not t
 
 ## Layer 1 - Measure the repository
 
-### 1. Build a clean sample
+### 1. Run the measurement
 
 ```bash
-N=400
-S=$(mktemp)
-git log --no-merges -n "$N" --pretty=format:'%an%x09%ae%x09%s' \
-  | awk -F'\t' '$1 !~ /\[.*[Bb]ot.*\]|[-_ ][Bb]ot$/ && $2 !~ /\[.*bot.*\]|bot@|actions@github\.com/' > "$S"
-cut -f3 "$S" > "$S.subj"
-
-wc -l < "$S"                                              # usable sample size
-awk -F'\t' '{print $1}' "$S" | sort | uniq -c | sort -rn | head -5   # authors
+bash "${CLAUDE_SKILL_DIR}/scripts/commit-profile.sh"
 ```
 
-**Pitfalls. Each of these has produced a wrong reading in practice:**
+`-n` changes the sample size; `-x '<author regex>'` excludes a bot the default filter missed.
 
-- **Bots.** A mainline that is half automated version bumps halves every ratio you compute. The filter above catches the common naming patterns; the author histogram is printed so you can spot the ones it misses and re-filter by name.
-- **The filter has to reach every axis, not just the subjects.** Any axis measured by a second, unfiltered `git log` quietly readmits the bots. Measured on a bot-heavy repo, an unfiltered body axis reported a median body of 1 line where the human median was 10 - and a 1-line median is exactly what tells the skill "this repo does not use bodies". Compare the sample sizes across axes; if they differ, an axis is unfiltered.
+**The measurement lives in a script, and has to stay there.** A skill body is rewritten by
+slash-command argument substitution before it reaches you: a `$` followed by a digit is replaced
+with the words the user passed. awk field references have exactly that shape, so inlining awk here
+means any invocation carrying arguments corrupts the programs *and* swallows the user's request.
+It does not error - measured on a 400-commit repo it disabled the bot filter, moved every ratio,
+and reported a subject length of `median 0 p90 0`. Script files are not substituted. Do not move
+awk back into this file.
+
+**Pitfalls the script encodes. Each of these has produced a wrong reading in practice:**
+
+- **Bots.** A mainline that is half automated version bumps halves every ratio you compute. The filter catches the common naming patterns; the author histogram is printed so you can spot the ones it misses and re-run with `-x`.
+- **The filter has to reach every axis, not just the subjects.** Any axis measured by a second, unfiltered `git log` quietly readmits the bots. Measured on a bot-heavy repo, an unfiltered body axis reported a median body of 1 line where the human median was 10 - and a 1-line median is exactly what tells the skill "this repo does not use bodies". The script prints the sample size on both the subject and body axes; if they differ, an axis is unfiltered.
 - **Merge commits.** `--no-merges` is not optional - nobody wrote those subjects.
 - **Squash detection.** Do not conclude "squash-merged" from a `(#N)` subject suffix. Whether it appears depends on the PR title convention, so it can be absent in a repo that squashes every PR. Use parent counts, and treat `(#N)` as a secondary signal only.
-- **Trailers are not a body.** A commit whose body is only `Co-authored-by:` or `Signed-off-by:` lines registers as having one. In a repo that adds a co-author trailer to every squash this reads as near-total body usage with a median of 1 line - the same false signal as an unfiltered bot. Strip them before deciding a body exists.
-- **Never use NUL as an awk record separator.** `RS="\0"` is an empty string to awk, which silently switches it to paragraph mode and splits on blank lines instead. It does not error; it returns a plausible number. It reported 100% body usage against a true 41%. Use `\001`.
+- **Trailers are not a body.** A commit whose body is only `Co-authored-by:` or `Signed-off-by:` lines registers as having one. In a repo that adds a co-author trailer to every squash this reads as near-total body usage with a median of 1 line - the same false signal as an unfiltered bot. They are stripped before deciding a body exists.
+- **Never use NUL as an awk record separator.** `RS="\0"` is an empty string to awk, which silently switches it to paragraph mode and splits on blank lines instead. It does not error; it returns a plausible number. It reported 100% body usage against a true 41%. The script uses `\001`.
+- **Never pass a regex through `awk -v`.** `-v` runs escape processing over the value, so `\[` arrives as `[` and the pattern silently widens. The bot filters are written as awk regex literals for this reason; the caller-supplied `-x` pattern comes in through `ENVIRON`, which does not.
 
 ### 2. Read the axes
-
-```bash
-T=$(wc -l < "$S"); pct() { awk -v t="$T" '{n++} END {printf "%d%%\n", (t?100*n/t:0)}'; }
-
-printf 'non-ascii subject  : '; LC_ALL=C awk '/[\200-\377]/'       "$S.subj" | pct
-printf 'conventional prefix: '; awk '/^[A-Za-z]+(\([^)]*\))?!?: /' "$S.subj" | pct
-printf 'scoped             : '; awk '/^[A-Za-z]+\([^)]*\)!?: /'    "$S.subj" | pct
-printf 'starts uppercase   : '; sed 's/^[A-Za-z]*([^)]*)!*: //; s/^[A-Za-z]*!*: //' "$S.subj" | awk '/^[A-Z]/' | pct
-printf 'trailing period    : '; awk '/\.$/'                        "$S.subj" | pct
-printf 'PR ref suffix      : '; awk '/\(#[0-9]+\)$/'               "$S.subj" | pct
-
-# subject length in characters, not bytes
-LC_ALL=C awk '{s=$0; gsub(/[\300-\377][\200-\277]*/,"x",s); print length(s)}' "$S.subj" \
-  | sort -n | awk '{v[NR]=$1} END {printf "length             : median %d  p90 %d\n", v[int((NR+1)/2)], v[NR<10?NR:int(NR*0.9)]}'
-
-# the vocabulary actually in use here - not a list carried in from elsewhere
-echo "types:";  sed -n 's/^\([A-Za-z][A-Za-z]*\)\(([^)]*)\)\{0,1\}!\{0,1\}:.*/\1/p' "$S.subj" | sort | uniq -c | sort -rn | head -8
-echo "scopes:"; sed -n 's/^[A-Za-z][A-Za-z]*(\([^)]*\))!\{0,1\}:.*/\1/p'             "$S.subj" | sort | uniq -c | sort -rn | head -8
-
-# body usage. Carries author and email so the SAME filter applies, and strips trailers.
-git log --no-merges -n "$N" --pretty=format:'%x01%an%x02%ae%x02%b' \
-  | awk 'BEGIN{RS="\001"; FS="\002"} NR>1 {
-      if ($1 ~ /\[.*[Bb]ot.*\]|[-_ ][Bb]ot$/ || $2 ~ /\[.*bot.*\]|bot@|actions@github\.com/) next
-      t++; n=split($3, L, "\n"); b=""
-      for (i=1;i<=n;i++) if (tolower(L[i]) !~ /^(co-authored-by|signed-off-by|co-committed-by):/) b = b L[i] "\n"
-      gsub(/^[ \n]+|[ \n]+$/,"",b)
-      if (b != "") {w++; print split(b,a,"\n") > "/dev/stderr"}
-    } END {printf "with body          : %d%%\n", (t?100*w/t:0)}' 2>"$S.body"
-sort -n "$S.body" | awk '{v[NR]=$1} END {if (NR) printf "body lines present : median %d\n", v[int((NR+1)/2)]}'
-
-# how branch work lands on the mainline
-git log -n "$N" --pretty=format:'%p' | awk '{c[NF]++} END {for (k in c) printf "%s-parent: %d\n", k, c[k]}'
-```
 
 What each measurement decides:
 
