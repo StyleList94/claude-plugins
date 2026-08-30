@@ -85,6 +85,13 @@ and awk field references have that exact shape. Do not inline awk here.
 
 If the current branch departs from the observed pattern, say so and suggest a name that fits it. **Do not block** - report and continue.
 
+**An empty result is not a finding.** A repository that deletes branches after merge leaves nothing
+to measure, so zero prefixes means the convention is *unobservable here*, not that the repository
+has none - and in a squash repo the merge commits cannot give the names back either. The script
+says this outright rather than printing nothing, because a silent zero-line output reads as an
+observation. Recover the pattern from merged PRs before concluding anything about naming:
+`gh pr list --state all --json headRefName`.
+
 ## Step 3: Build the title in the repository's measured form
 
 Run Layer 1 of the `commit` skill against this repository and write the title in the form it reports: language, prefix style, scope usage, case, and length target. Do not assume a convention the repo does not have.
